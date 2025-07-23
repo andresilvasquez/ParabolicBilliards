@@ -81,7 +81,7 @@ run_not_optimized:
 
 omp_times:
 	@echo "Evaluacion de threads de OMP"
-	cd ComputationalTimes && chmod +x ./tiempos_threads.sh
+	cd ComputationalTimes && chmod +x tiempos_threads.sh && ./tiempos_threads.sh
 	cd ../
 
 animation_k:
@@ -99,5 +99,6 @@ clean:
           ComputationalTimes/compute_billiard_cuda.o \
           ComputationalTimes/tiempos_cpp.txt \
           ComputationalTimes/tiempos_cuda.txt \
-          ComputationalTimes/boundary.dat
+          ComputationalTimes/boundary.dat \
+		  ComputationalTimes/tiempos_OMP_threads.txt \
 

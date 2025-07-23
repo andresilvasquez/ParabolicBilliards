@@ -1,0 +1,48 @@
+Bootstrap: docker
+From: nvcr.io/nvidia/nvhpc:22.9-devel-cuda11.7-ubuntu22.04
+
+%post
+    # 1. Instalar dependencias del sistema
+    apt-get update && apt-get install -y \
+        build-essential \
+        cmake \
+        git \
+        libboost-math-dev \       # Para Boost (hankel.hpp)
+        libeigen3-dev \           # Para Eigen
+        libomp-dev \              # Para OpenMP
+        python3 \
+        python3-pip \
+        && rm -rf /var/lib/apt/lists/*
+
+    # 2. Instalar librerías de Python
+    pip3 install \
+        numpy==1.24.3 \
+        scipy==1.10.1 \           # Para hankel1
+        matplotlib==3.7.2 \
+        seaborn==0.12.2 \
+        jupyter \                 # Para el notebook
+        ipykernel
+
+    # 3. Configurar Eigen (ya instalado via libeigen3-dev)
+    export EIGEN3_INCLUDE_DIR=/usr/include/eigen3
+
+%environment
+    export LC_ALL=C
+    export PATH=/usr/local/bin:$PATH
+    export EIGEN3_INCLUDE_DIR=/usr/include/eigen3
+    export OMP_NUM_THREADS=4      # Opcional: ajusta el número de hilos para OpenMP
+
+%runscript
+    echo "Entorno configurado para Lippmann-Schwinger BWM con CUDA, Eigen, Boost y Python."
+
+%labels
+    Author Grupo 2 HPC 2025-1
+    Description NVIDIA HPC SDK 22.9 + CUDA 11.7 + Eigen + Boost + Python (SciPy/NumPy/Matplotlib)
+    Version 2.0
+
+%help
+    Este contenedor incluye:
+      - NVIDIA HPC SDK 22.9 y CUDA 11.7
+      - Bibliotecas C++: Eigen 3, Boost (math), OpenMP
+      - Python 3 con numpy, scipy, matplotlib, jupyter
+      - Soporte para códigos CUDA (cusolver, cublas, cuComplex)
