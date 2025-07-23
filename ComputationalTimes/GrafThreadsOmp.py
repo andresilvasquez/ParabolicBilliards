@@ -10,7 +10,7 @@ def main():
     datos = np.loadtxt("tiempos_OMP_threads.txt")
 
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(datos[:, 0], datos[:, 1], marker='o', ms=6, mec='black')
+    ax.plot(datos[:, 0], datos[:, 2], marker='o', ms=6, mec='black')
     ax.set_xlabel("Número de threads", fontsize=15)
     ax.set_ylabel("Wall time (seg)", fontsize=15)
     ax.legend(fontsize=12)
