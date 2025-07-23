@@ -49,6 +49,7 @@ int main(int argc, char* argv[]){
     end = std::chrono::high_resolution_clock::now();
     elapsed = end - start;
 
+    // Threads, tamaño de la matriz y tiempo computacional
     std::cout << threads << "\t" << num_b << "\t" << elapsed.count() << "\n";
 
     return 0;

@@ -14,7 +14,7 @@ def main():
 
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(datCpp[:, 1], datCpp[:, 2], label="C++", marker='o', ms=6, mec='black')
-    ax.plot(datCuda[:, 1], datCuda[:, 2], label="CUDA", marker='o', ms=6, mec='black')
+    ax.plot(datCuda[:, 0], datCuda[:, 1], label="CUDA", marker='o', ms=6, mec='black')
     ax.set_xlabel("Tamaño de la malla", fontsize=15)
     ax.set_ylabel("Wall time (seg)", fontsize=15)
     ax.legend(fontsize=12)

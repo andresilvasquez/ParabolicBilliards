@@ -79,18 +79,24 @@ run_not_optimized:
 	cd ComputationalTimes && chmod +x tiempos_noOpt.sh && ./tiempos_noOpt.sh
 	cd ../
 
+# Grafica comparativa variando el numero de threads para algoritmo serial con -Ofast
 omp_times:
 	@echo "Evaluacion de threads de OMP"
 	cd ComputationalTimes && chmod +x tiempos_threads.sh && ./tiempos_threads.sh
 	cd ../
 
+# Creacion del video en el que se varia el numero de onda de la onda incidente
 animation_k:
 	@echo "Ejecutando video variando numero de onda ..."
 	cd Videos && chmod +x video_k.sh && ./video_k.sh
 	cd ../
 
-
-
+# Creacion del video en el que se varia el angulo de la onda incidente
+animation_angles:
+	@echo "Ejecutando video variando el angulo de incidencia"
+	cd Videos && chmod +x video_ang.sh && ./video_ang.sh
+	cd ../
+	
 clean:
 	rm -f $(BOUNDARY_BIN) $(BOUNDARY_DAT) \
 	      $(COMPUTE_BIN) $(DENSITY_DAT) $(PHASE_DAT) \

@@ -46,11 +46,13 @@ public:
         T               = buildTMatrix();
     }
 
+    // Compute the incident wave as a plane wave
     Complex incidentWave(double x, double y) const {
         static const Complex I(0.0, 1.0);
         return std::exp(I * (kx*x + ky*y));
     }
 
+    // Scan the spectrum in order to find resonances
     Spectrum scanSpectrum(double k_min=0.1, double k_max=2.0,
                           int num_points=100,
                           double refine_window=0.05,
@@ -67,6 +69,7 @@ public:
         return { std::move(ks), std::move(norms), std::move(refined) };
     }
 
+    // Compute the scattered wave given an observation point (OMP parallel threads)
     std::vector<Complex> computeScatteredWave(const std::vector<Vector2d>& obs) {
         VectorXcd phi(N);
         for (size_t i = 0; i < N; ++i)
@@ -86,9 +89,12 @@ public:
     }
 
 private:
+    // Compute the index of a flat matrix in row major
     size_t idx(size_t i, size_t j) const { return i*N + j; }
+    // Compute the row and column of a matrix in row major
     std::pair<size_t,size_t> ij(size_t id) const { return { id/N, id%N }; }
 
+    // Compute the segment lengths of the boundary points
     std::vector<double> calculateSegmentLengths() const {
         std::vector<double> L(N);
         for (size_t i = 0; i < N; ++i) {
@@ -98,6 +104,7 @@ private:
         return L;
     }
 
+    // Compute the green function given it's form in  Hankel function
     Complex green(const Vector2d& r1, const Vector2d& r2) const {
         double R = (r1 - r2).norm();                                  // Distance between the observation point and the boundary point
         if (R < 1e-10) return handleDiagonal();                       // If the observation point is near the boundary point, avoid infinite values
@@ -105,6 +112,7 @@ private:
         return I*(1.0/4.0) * boost::math::cyl_hankel_1(0, k*R); // Compute the Green function given the Hankel function of order zero
     }
 
+    // Avoid points where the Hankel function could throw underflow
     Complex handleDiagonal() const {
         double avg = std::accumulate(segment_lengths.begin(),
                                      segment_lengths.end(), 0.0) / N;
@@ -114,6 +122,7 @@ private:
              * avg;
     }
 
+    // Construct the M matrix as a 1D structure
     std::vector<Complex> buildMMatrixFlat() {
         std::vector<Complex> M(N*N);
         #pragma omp parallel for num_threads(threads)
@@ -127,6 +136,7 @@ private:
         return M;
     }
 
+    // Compute the interaction matrix T
     MatrixXcd buildTMatrix() {
         MatrixXcd Mmat(N,N);
         for (size_t i=0;i<N;++i)
@@ -145,6 +155,7 @@ private:
         }
     }
 
+    // Make the first scan of the spectrum
     std::pair<std::vector<double>,std::vector<double>>
     initialScan(double k_min, double k_max, int np) {
         std::vector<double> ks(np), norms(np);
@@ -156,6 +167,7 @@ private:
         return {ks, norms};
     }
 
+    // Find potential peaks for the resonances (Wave number)
     std::vector<double> findPeaks(const std::vector<double>& ks,
                                   const std::vector<double>& norms,
                                   double k_min, double k_max) const
@@ -189,6 +201,7 @@ private:
         return peaks;
     }
 
+    // Given the peaks of k, refine the resonances that have been found
     std::vector<double> refineResonances(const std::vector<double>& peaks,
                                          double window, int iter,
                                          double tol, int ppw)
@@ -213,6 +226,7 @@ private:
         return refined;
     }
 
+    // Update the wave number components and the matrices M and T
     void updateK(double newk) {
         k  = newk;
         kx = k*std::cos(angle);
