@@ -79,10 +79,16 @@ run_not_optimized:
 	cd ComputationalTimes && chmod +x tiempos_noOpt.sh && ./tiempos_noOpt.sh
 	cd ../
 
+omp_times:
+	@echo "Evaluacion de threads de OMP"
+	cd ComputationalTimes && chmod +x ./tiempos_threads.sh
+	cd ../
+
 animation_k:
 	@echo "Ejecutando video variando numero de onda ..."
 	cd Videos && chmod +x video_k.sh && ./video_k.sh
 	cd ../
+
 
 
 clean:
