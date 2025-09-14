@@ -1,56 +1,74 @@
-Video presentation:
-https://youtu.be/m5GvO2jOCF4
+# Quantum Scattering in Parabolic Billiards
 
-WARNING: This repository is based in the implementation of a NVIDIA GeForce 940MX GPU. If other GPU is employed, the architecture flag given to the compiler nvcc must be changed. (-arch=sm_50)
+## Video presentation
+[Watch on YouTube](https://youtu.be/m5GvO2jOCF4)
 
-This repository contains code to implement the Boundary Wall Method in order to solve the 
-Lippmann-Schwinger equation, which is an integral equation used in scattering theory to 
-describe scattering processes given some potentials, which in this case, will be potentials
-defined as contour integrals over parabollic contours weight by some gamma factor which
-dependes on the parameter of the parabollical contour.
+---
 
-Analytical solutions are known for the problem of parabollic contours (see the jupyter notebook
-LS.ipynb) and so this BWM can be proved to be efficient and approximate to analytical solutions.
-By the way the Boundary Wall Method is based in matrices operations and many Hankel functions
-evaluations in order to compute the scattered wave, parallel executions are proposed in order to
-attack this problem and gain efficiency, so, CUDA and OMP parallel will be studied in this problem to determine some parallel metrics based on wall times and comparing this to the serial
-implementation in C++.
+## Introduction
+This repository implements the **Boundary Wall Method (BWM)** to solve the **Lippmann–Schwinger (LS) integral equation**, a central tool in scattering theory. The LS equation describes how an incident wave is scattered by a potential.  
 
-The repository is organized as follows:
+In this case, the potentials are defined along **parabolic contours** weighted by a parameter-dependent function. Analytical solutions are known for this geometry, allowing us to validate the numerical BWM approach.
 
-- Makefile: This contains every make command defined in order to execute different tasks which will be explained later.
+---
 
-- include/: Contains the main code files both in C++ and CUDA. For both of this it is
-included the generation of parabolic billiards and the Boundary Wall Method.
+## Lippmann–Schwinger Equation and BWM Approximation
 
-- ComputationalTimes/: Contains the Python, C++ and CUDA files needed to implement the
-time metrics and grafication of this for both C++ and CUDA implementations as matrix dimensions are bigger and optimizers for both compilers are included in the compilation flags.
+The LS equation for this problem is:
 
-- plot_dprob_dfase/: Contains the C++ and CUDA files for computing the scattered wave given the billiard parameters, the wave number and the angle of the incident wave in degrees. The plotting is done by matplotlib yn Python.
+$$
+\psi(\mathbf{r}) = \phi(\mathbf{r}) + \alpha \int_C H_0^{(1)}(kR)\,\gamma(s)\,\psi(\mathbf{r}'(s))\,ds'
+$$
 
-- plot_spectrum/: This directory contains the C++ code that calculates the resonances for this problem in a billiard. CUDA code is not included by the way this problem isn't really hard to compute.
+The BWM discretization approximates the integral by a weighted sum over contour points:
 
-- Videos/: This includes the C++ code that computes and organizes the different .dat outputs as the wave number or the angle of the inciden wave is changed. The animation is done in Python.
+$$
+\psi(\mathbf{r}) \approx \phi(\mathbf{r}) + \alpha \sum_{j=1}^{N} H_0^{(1)}\!\left(k\lvert \mathbf{r}-\mathbf{r}_j'\rvert\right)\,\Delta s\,(\mathbb{T}\Phi)_j
+$$
 
-- LS.ipynb: This jupyter notebook contains the analytical solution for the parabollic problem (not confocal).
+---
 
+## Main Results
 
-The makefile targets are the following:
+- **Resonant Modes**  
+  By scanning the spectrum of the **|T| matrix** as a function of \(k^2\), we identify peaks corresponding to resonant modes.  
+  ![Spectrum](Figures/Spectrum.png)  
+  Animated results show the scattered wave patterns at resonance:  
+  ![Resonant animation](Figures/kgif.gif)
 
-- plotb: Plots the contour.
+- **Odd and Even Modes**  
+  Resonances behave differently depending on the **incident angle of the wave**. Odd and even modes exhibit distinct scattering profiles.  
+  ![Angle dependence](Figures/anglegif.gif)
 
-- plot: Plots the probability density and the phase of the scattered wave.
+These results confirm that the BWM reproduces expected spectral features and captures the angular dependence of resonant states.
 
-- plotspec: Plot the spectrum with the resonances identified.
+---
 
-- run_optimized: Executes the C++ and CUDA implementations with optimizers and registers the times recorded for different contour and grid number of points.
+## Repository Structure
 
-- run_not_optimized: Executes the C++ and CUDA implementations without optimizers and registers the times recorded for different contour and grid number of points.
+- **Makefile** — defines compilation and analysis commands.  
+- **include/** — main C++ and CUDA implementations, including billiard generation and the BWM.  
+- **ComputationalTimes/** — code for timing, profiling, and plotting performance metrics.  
+- **plot_dprob_dfase/** — compute and plot probability density & phase of the scattered wave.  
+- **plot_spectrum/** — compute the spectrum and identify resonances.  
+- **Videos/** — generate animations of scattered waves across \(k\) or incident angle.  
+- **LS.ipynb** — Jupyter notebook with the analytical solution for non-confocal parabolic contours.
 
-- omp_times: Executes the C++ implementation for different number threads
+---
 
-- animation_k: Executes the multiple calls using parallel to compute the scattered wave by changing the wave number.
+## Makefile Targets
 
-- animation_angles: Executes the multiple calls using parallel to compute the scattered wave as the angle of the incident wave is changed from 0 to 90 degrees.
+- `plotb` — Plot the billiard contour.  
+- `plot` — Plot probability density and phase of scattered wave.  
+- `plotspec` — Compute and plot spectrum with resonances.  
+- `run_optimized` — Run optimized C++/CUDA implementations and record timings.  
+- `run_not_optimized` — Run non-optimized builds for timing comparison.  
+- `omp_times` — Benchmark C++ implementation with varying thread counts.  
+- `animation_k` — Generate animations scanning over wave number.  
+- `animation_angles` — Generate animations scanning over incident wave angle.  
+- `make clean` — Remove temporary data before generating new `.txt` outputs.  
 
-WARNINGS: Before executing any task that saves data in .txt files be sure to execute "make clean" before doing so, in order to avoid accumulating data.
+---
+
+## Warning
+This repository is configured for an **NVIDIA GeForce 940MX GPU**. If using another GPU, adjust the architecture flag in `nvcc` (`-arch=sm_50`). Always run `make clean` before regenerating data to avoid accumulation in output files.
